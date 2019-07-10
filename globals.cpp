@@ -25,6 +25,25 @@ struct UI_SIZING
     float GRID_HEIGHT = 768;
 };
 
+//struct GRID
+//{
+//
+//};
+
+enum ELEMENT_TYPE
+{
+    BLOCK,
+    ENEMY,
+    ITEM,
+    UNIQUE
+};
+
+struct ACTIVE_ELEMENT
+{
+    ELEMENT_TYPE TYPE;
+    std::vector<int> FLAGS = {0};
+};
+
 UI_SIZING UI;
 LAYER layer_grid = {"Grid", true};
 LAYER layer_blocks = {"Blocks", true};
@@ -36,8 +55,11 @@ LAYER layer_background = {"Background", true};
 int col_title_text = IM_COL32(255,130,0,255);
 int col_normal_text = IM_COL32(255,255,255,255);
 int col_grid = IM_COL32(255,130,0,255);
-//int col_toggle_button = IM_COL32(255,130,0,255);
+
 //std::vector<TRACK> tracks_list;
 //std::vector<std::vector<NOTE_DATA>> module;
 
 ImDrawList* draw_list;
+ACTIVE_ELEMENT active_element;
+
+std::vector<sf::Texture> tex_blocks;

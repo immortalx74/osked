@@ -33,6 +33,7 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Color.hpp>
 
 #include <cmath>
 #include "imgui.h"
@@ -55,13 +56,15 @@
 int main()
 {
     
-	sf::RenderWindow window(sf::VideoMode(1024, 920), "Open Solomon's Key Editor", sf::Style::Default);
-	window.setPosition(ImVec2(100,0));
+	sf::RenderWindow window(sf::VideoMode(1280, 860), "Open Solomon's Key Editor", sf::Style::Default);
+	window.setPosition(ImVec2(0,0));
     window.setFramerateLimit(60);
 	ImGui::SFML::Init(window);
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
     sf::Clock deltaClock;
 	
+    LoadTextures();
+    
     while (window.isOpen())
     {
         sf::Event event;
@@ -112,7 +115,28 @@ int main()
             //
         }
         
+        ImGui::Spacing();
+        
+        
         // blocks
+        ImGui::PushStyleColor(ImGuiCol_Text, col_title_text);
+        ImGui::Text("Blocks");
+        ImGui::PopStyleColor();
+        
+        if (ImGui::ImageButton(tex_blocks[0], ImVec2(64,64)))
+        {
+            
+        }
+        ImGui::SameLine();
+        if (ImGui::ImageButton(tex_blocks[1], ImVec2(64,64)))
+        {
+            
+        }
+        ImGui::SameLine();
+        if (ImGui::ImageButton(tex_blocks[2], ImVec2(64,64)))
+        {
+            
+        }
         
         ImGui::End();
         

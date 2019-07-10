@@ -19,3 +19,23 @@ void DrawGrid()
         y_offset += 64;
     }
 }
+
+void LoadTextures()
+{
+	int x_offset = 0;
+	sf::Texture t;
+    
+	for (int i = 0; i < 3; ++i)
+	{
+	    if (!t.loadFromFile("res/blocks/blocks.png", sf::IntRect(x_offset, 0, 64, 64)))
+	    {
+	        std::cout << "error";
+	    }
+		
+	    tex_blocks.push_back(t);
+	    x_offset += 64;
+	}
+    
+    //x_offset = 0;
+    
+}
