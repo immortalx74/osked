@@ -77,7 +77,7 @@ void LoadTextures()
     }
     
     //backgrounds
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 27; ++i)
     {
         backgrounds_list.push_back(i);
     }
@@ -164,6 +164,7 @@ bool LayerIsVisible(ELEMENT_TYPE el_type)
         {
             return false;
         }
+        return true;
         break;
         
         case UNIQUE_PLAYER:case UNIQUE_DOOR:case UNIQUE_KEY:
@@ -171,6 +172,7 @@ bool LayerIsVisible(ELEMENT_TYPE el_type)
         {
             return false;
         }
+        return true;
         break;
         
         case ENEMY:
@@ -178,6 +180,7 @@ bool LayerIsVisible(ELEMENT_TYPE el_type)
         {
             return false;
         }
+        return true;
         break;
         
         case ITEM:
@@ -185,6 +188,7 @@ bool LayerIsVisible(ELEMENT_TYPE el_type)
         {
             return false;
         }
+        return true;
         break;
         
         default:

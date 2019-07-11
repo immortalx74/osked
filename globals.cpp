@@ -60,7 +60,7 @@ LAYER layer_background = {"Background", true};
 
 int col_title_text = IM_COL32(255,130,0,255);
 int col_normal_text = IM_COL32(255,255,255,255);
-int col_grid = IM_COL32(100,100,100,100);
+int col_grid = IM_COL32(255,255,255,255);
 
 ImDrawList* draw_list;
 ELEMENT_TYPE active_element = BLOCK_VOID;
@@ -79,6 +79,7 @@ std::vector<sf::Texture> tex_enemies;
 std::vector<sf::Texture> tex_items;
 
 sf::Texture tex_background;
+sf::Texture tex_background_thumb;
 
 std::vector<std::vector<GRID>> grid;
 

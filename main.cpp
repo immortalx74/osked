@@ -43,7 +43,14 @@ int main()
         while (window.pollEvent(event))
         {
             ImGui::SFML::ProcessEvent(event);
-            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+            }
+            else if (event.type == sf::Event::Resized)
+            {
+                window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
+            }
 		}
         
 		ImGui::SFML::Update(window, deltaClock.restart());
@@ -227,8 +234,16 @@ int main()
                 
                 if (ImGui::IsItemHovered())
                 {
+                    std::string str_num = std::to_string(i+1);
+                    if (i < 9)
+                    {
+                        str_num = "0" + str_num;
+                    }
+                    std::string fname = "res/backgrounds/" + str_num + ".png";
+                    tex_background_thumb.loadFromFile(fname, sf::IntRect(0, 0, 960, 768));
+                    
                     ImGui::BeginTooltip();
-                    ImGui::Image(tex_background, ImVec2(64,64));
+                    ImGui::Image(tex_background_thumb, ImVec2(64,64));
                     ImGui::EndTooltip();
                 }
             }
@@ -245,6 +260,10 @@ int main()
         ImGui::SetNextWindowSize(ImVec2(app_window_width - UI.MAIN_X - UI.MARGIN, app_window_height - (2 * UI.MARGIN)));
         ImGui::SetNextWindowPos(ImVec2(UI.MAIN_X, UI.MAIN_Y));
         ImGui::SetNextWindowContentSize(ImVec2(960 + UI.MARGIN + 4, 768 + UI.MARGIN));
+        
+        float bg_alpha = 0.0f;
+        ImGui::SetNextWindowBgAlpha(bg_alpha);
+        
         ImGui::Begin("main", false, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
         
         draw_list = ImGui::GetWindowDrawList();
@@ -289,7 +308,7 @@ int main()
         ImGui::End();
         //=================================================================
         window.clear();
-        ImGui::SFML::Render(window);
+        //ImGui::SFML::Render(window);
         
         //background
         if (layer_background.VISIBLE)
@@ -299,6 +318,8 @@ int main()
             back.setPosition(UI.GRID_START_X, UI.GRID_START_Y);
             window.draw(back);
         }
+        
+        ImGui::SFML::Render(window);
         
         // grid elements
         for (int i = 0; i < 12; ++i)
