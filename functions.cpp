@@ -195,3 +195,31 @@ bool LayerIsVisible(ELEMENT_TYPE el_type)
         return true;
     }
 }
+
+void OpenElementOptions(int row, int col)
+{
+    bool p_opened = true;
+    ImGui::SetNextWindowSize(ImVec2(300, 200));
+    if (ImGui::BeginPopupModal("Element Options", &p_opened, ImGuiWindowFlags_NoResize))
+    {
+        std::string location = "Element at row:" + std::to_string(current_row)
+            + ", col:" + std::to_string(current_col);
+        
+        
+        
+        ImGui::Text(location.c_str());
+        
+        if (ImGui::Button("OK", ImVec2(80,0)))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        
+        ImGui::SameLine();
+        
+        if (ImGui::Button("Cancel", ImVec2(80,0)))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+}

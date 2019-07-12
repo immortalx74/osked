@@ -1,4 +1,3 @@
-//
 struct LAYER
 {
     std::string NAME;
@@ -40,6 +39,12 @@ enum ELEMENT_TYPE
     ITEM,
 };
 
+enum MODE
+{
+    MODE_PAINT,
+    MODE_EDIT
+};
+
 struct GRID
 {
     sf::Sprite SPRITE;
@@ -64,6 +69,8 @@ int col_grid = IM_COL32(255,255,255,255);
 
 ImDrawList* draw_list;
 ELEMENT_TYPE active_element = BLOCK_VOID;
+MODE mode = MODE_PAINT;
+
 
 int active_enemy = 0;
 int active_item = 0;

@@ -27,7 +27,7 @@
 int main()
 {
     
-	sf::RenderWindow window(sf::VideoMode(1280, 860), "Open Solomon's Key Editor", sf::Style::Default);
+	sf::RenderWindow window(sf::VideoMode(1250, 800), "Open Solomon's Key Editor", sf::Style::Default);
 	window.setPosition(ImVec2(0,0));
     window.setFramerateLimit(60);
 	ImGui::SFML::Init(window);
@@ -57,51 +57,69 @@ int main()
         //==================================================================
         // TOOLBOX
         
-        // layers
         int app_window_height = io.DisplaySize.y;
         int app_window_width = io.DisplaySize.x;
+        
         
         ImGui::SetNextWindowSize(ImVec2(UI.TOOLBOX_WIDTH, app_window_height - (2 * UI.MARGIN)));
         ImGui::SetNextWindowPos(ImVec2(UI.TOOLBOX_X + UI.MARGIN, UI.TOOLBOX_Y + UI.MARGIN));
         ImGui::Begin("toolbox", false, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 		
+        // file operations
+        if (ImGui::SmallButton("New"))
+        {
+            
+        }
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Open"))
+        {
+            
+        }
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Save"))
+        {
+            
+        }
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Save As"))
+        {
+            
+        }
+        ImGui::SameLine();
+        if (ImGui::SmallButton("About"))
+        {
+            ImGui::OpenPopup("about");
+        }
+        
+        bool p_about_opened = true;
+        if (ImGui::BeginPopupModal("about", &p_about_opened, ImGuiWindowFlags_NoResize))
+        {
+            ImGui::Text("Open Solomon's Key Editor\nv 1.0 07/2019\nBy Immortalx.\n\nSolomon's Key is a copyright of Tecmo.");
+            if (ImGui::Button("OK", ImVec2(80,0)))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+        
+        // layers list
         ImGui::PushStyleColor(ImGuiCol_Text, col_title_text);
         ImGui::Text("Layers");
         ImGui::PopStyleColor();
         
-        if(ImGui::Checkbox(layer_grid.NAME.c_str(), &layer_grid.VISIBLE))
-        {
-            //
-        }
-        
-        if(ImGui::Checkbox(layer_blocks.NAME.c_str(), &layer_blocks.VISIBLE))
-        {
-            //
-        }
-        
-        if(ImGui::Checkbox(layer_enemies.NAME.c_str(), &layer_enemies.VISIBLE))
-        {
-            //
-        }
-        
-        if(ImGui::Checkbox(layer_items.NAME.c_str(), &layer_items.VISIBLE))
-        {
-            //
-        }
-        
-        if(ImGui::Checkbox(layer_unique.NAME.c_str(), &layer_unique.VISIBLE))
-        {
-            //
-        }
-        
-        if(ImGui::Checkbox(layer_background.NAME.c_str(), &layer_background.VISIBLE))
-        {
-            //
-        }
+        ImGui::Checkbox(layer_grid.NAME.c_str(), &layer_grid.VISIBLE);
+        ImGui::Checkbox(layer_blocks.NAME.c_str(), &layer_blocks.VISIBLE);
+        ImGui::Checkbox(layer_enemies.NAME.c_str(), &layer_enemies.VISIBLE);
+        ImGui::Checkbox(layer_items.NAME.c_str(), &layer_items.VISIBLE);
+        ImGui::Checkbox(layer_unique.NAME.c_str(), &layer_unique.VISIBLE);
+        ImGui::Checkbox(layer_background.NAME.c_str(), &layer_background.VISIBLE);
         
         // Get current selection from toolbox
         ImVec2 cur_pos = ImGui::GetCursorPos();
-        ImGui::SetCursorPos(ImVec2(UI.TOOLBOX_X + 180, UI.TOOLBOX_Y + (2 * UI.MARGIN)));
+        ImGui::SetCursorPos(ImVec2(UI.TOOLBOX_X + 180, UI.TOOLBOX_Y + 37));
         ImGui::PushStyleColor(ImGuiCol_Text, col_title_text);
         ImGui::Text("Selected");
         ImGui::PopStyleColor();
@@ -109,12 +127,39 @@ int main()
         
         sf::Texture sel_item = GetItemTexture(active_element);
         ImGui::Image(sel_item);
+        
+        // Switch MODE button
+        std::string mode_name;
+        if (mode == MODE_PAINT)
+        {
+            mode_name = " DRAW\n MODE ";
+        }
+        else
+        {
+            mode_name = " EDIT\n MODE ";
+        }
+        ImGui::Spacing();
+        ImGui::SetCursorPosX(UI.TOOLBOX_X + 180);
+        if (ImGui::Button(mode_name.c_str()))
+        {
+            if (mode == MODE_PAINT)
+            {
+                mode = MODE_EDIT;
+            }
+            else
+            {
+                mode = MODE_PAINT;
+            }
+        }
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("DRAW MODE: Paint selected element on grid with the left mouse button.\nEDIT MODE: Double click an existing element on grid to set its options.");
+        }
         ImGui::SetCursorPos(cur_pos);
         
         ImGui::Spacing();
         
-        
-        // blocks
+        // blocks list
         ImGui::PushStyleColor(ImGuiCol_Text, col_title_text);
         ImGui::Text("Blocks");
         ImGui::PopStyleColor();
@@ -137,7 +182,7 @@ int main()
         ImGui::Spacing();
         
         
-        //unique
+        //unique list
         ImGui::PushStyleColor(ImGuiCol_Text, col_title_text);
         ImGui::Text("Unique");
         ImGui::PopStyleColor();
@@ -159,7 +204,7 @@ int main()
         
         ImGui::Spacing();
         
-        //enemies
+        //enemies list
         ImGui::PushStyleColor(ImGuiCol_Text, col_title_text);
         ImGui::Text("Enemies");
         ImGui::PopStyleColor();
@@ -172,7 +217,7 @@ int main()
                 {
                     active_enemy = i;
                     active_element = ENEMY;
-                }
+                } 
                 
                 if (ImGui::IsItemHovered())
                 {
@@ -185,7 +230,7 @@ int main()
         ImGui::ListBoxFooter();
         
         
-        //items
+        //items list
         ImGui::PushStyleColor(ImGuiCol_Text, col_title_text);
         ImGui::Text("Items");
         ImGui::PopStyleColor();
@@ -210,8 +255,7 @@ int main()
         }
         ImGui::ListBoxFooter();
         
-        
-        //backgrounds
+        //backgrounds list
         ImGui::PushStyleColor(ImGuiCol_Text, col_title_text);
         ImGui::Text("Backgrounds");
         ImGui::PopStyleColor();
@@ -250,7 +294,9 @@ int main()
         }
         ImGui::ListBoxFooter();
         
-        //debug info
+        ImGui::Spacing();
+        
+        // draw debug info
         ImGui::Text("mouse_x:");ImGui::SameLine();ImGui::Text(std::to_string(ImGui::GetMousePos().x).c_str());
         ImGui::Text("mouse_y:");ImGui::SameLine();ImGui::Text(std::to_string(ImGui::GetMousePos().y).c_str());
         
@@ -261,20 +307,20 @@ int main()
         ImGui::SetNextWindowPos(ImVec2(UI.MAIN_X, UI.MAIN_Y));
         ImGui::SetNextWindowContentSize(ImVec2(960 + UI.MARGIN + 4, 768 + UI.MARGIN));
         
-        float bg_alpha = 0.0f;
+        float bg_alpha = 0.0f; // this allows the grid to be visible over the background
         ImGui::SetNextWindowBgAlpha(bg_alpha);
         
         ImGui::Begin("main", false, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
         
         draw_list = ImGui::GetWindowDrawList();
         
-        // grid
+        // draw wireframe grid
         if (layer_grid.VISIBLE)
         {
             DrawGrid();
         }
         
-        //mouse
+        // store elements on mouse click
         if (ImGui::IsWindowHovered())
         {
             grid_hovered = true;
@@ -284,7 +330,7 @@ int main()
             if (current_row > 11) current_row = 11;
             if (current_col > 14) current_col = 14;
             
-            if (ImGui::IsMouseDown(0))
+            if (ImGui::IsMouseDown(0) && mode == MODE_PAINT)
             {
                 grid[current_row][current_col].TYPE = active_element;
                 sf::Texture &t = GetItemTexture(active_element);
@@ -299,18 +345,26 @@ int main()
                     grid[current_row][current_col].SUBTYPE = active_item;
                 }
             }
+            
+            if (ImGui::IsMouseDoubleClicked(0) && mode == MODE_EDIT)
+            {
+                if (grid[current_row][current_col].TYPE != BLOCK_VOID)
+                {
+                    ImGui::OpenPopup("Element Options");
+                }
+                
+            }
         }
         else
         {
             grid_hovered = false;
         }
         
-        ImGui::End();
-        //=================================================================
-        window.clear();
-        //ImGui::SFML::Render(window);
+        OpenElementOptions(current_row, current_col);
         
-        //background
+        window.clear();
+        
+        // draw background
         if (layer_background.VISIBLE)
         {
             sf::Sprite back;
@@ -319,9 +373,7 @@ int main()
             window.draw(back);
         }
         
-        ImGui::SFML::Render(window);
-        
-        // grid elements
+        // read grid vector and draw elements
         for (int i = 0; i < 12; ++i)
         {
             for (int j = 0; j < 15; ++j)
@@ -333,8 +385,8 @@ int main()
             }
         }
         
-        // current item at mouse
-        if (grid_hovered)
+        // set current item at mouse
+        if (grid_hovered && mode == MODE_PAINT)
         {
             sf::Sprite s;
             s.setTexture(GetItemTexture(active_element));
@@ -342,11 +394,14 @@ int main()
             window.draw(s);
         }
         
+        ImGui::End();
+        
+        ImGui::SFML::Render(window);
+        
         window.display();
     }
     
     // shut down
     ImGui::SFML::Shutdown();
     
-    //std::cin.get();
 }
