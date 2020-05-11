@@ -10,6 +10,10 @@
 #define MIN_SPEED 1
 #define MAX_SPEED 10
 #define DEFAULT_DIR 1
+#define KAMEERA_MIRROR_INDEX 13
+#define DEFAULT_DELAY 20
+#define DEFAULT_INTERVAL 20
+#define DEFAULT_NUM_ENEMIES_SPAWNED 1
 
 struct METRICS
 {
@@ -102,6 +106,17 @@ struct CELL
     
     int SPEED = DEFAULT_SPEED;
     int DIR = DEFAULT_DIR;
+    
+    bool IS_SPAWN_GATE = false;
+    int DELAY;
+    int INTERVAL;
+    int NUM_ENEMIES_SPAWNED;
+    int ENEMY1_INDEX;
+    int ENEMY1_SPEED;
+    int ENEMY1_DIR;
+    int ENEMY2_INDEX;
+    int ENEMY2_SPEED;
+    int ENEMY2_DIR;
 };
 
 CELL level[180];

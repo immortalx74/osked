@@ -150,8 +150,8 @@ void SaveLevel(std::string filename)
     }
     file << "#Auto-generated from osked\n";
     file << "\n";
-    file << "background=";
-    file << "\n";
+    file << "BG ";
+    file << background_index;
     file << "\n";
     
     for (int i = 0; i < 180; ++i)
@@ -192,9 +192,17 @@ void SaveLevel(std::string filename)
             file << ",";
             file << level[i].INDEX;
             file << ",";
-            file << level[i].SPEED;
-            file << ",";
-            file << level[i].DIR;
+            
+            if(level[i].INDEX == KAMEERA_MIRROR_INDEX)
+            {
+                //enemy1,speed1,dir1,enemy2,speed2,dir2
+            }
+            else
+            {
+                file << level[i].SPEED;
+                file << ",";
+                file << level[i].DIR;
+            }
         }
         else if(level[i].TYPE == ITEM)
         {
@@ -207,6 +215,37 @@ void SaveLevel(std::string filename)
         
         
     }
+    
+    file.close();
+}
+
+void LoadLevel(std::string filename)
+{
+    std::ifstream file;
+    file.open(filename);
+    std::string line;
+    int value = 0;
+    std::string ch;
+    
+    while(std::getline(file, line))
+    {
+        for (int i = 0; i < line.length(); ++i)
+        {
+            if(isdigit(line.at(i)))
+            {
+                ch = line.at(i);
+                value = std::stoi(ch);
+                std::cout << value;
+                if(value == 0)
+                {
+                    
+                }
+            }
+            
+        }
+        std::cout << "   --line end\n";
+    }
+    
     
     file.close();
 }
@@ -230,33 +269,162 @@ void OpenPropertiesWindow()
         
         if(el_type == ENEMY)
         {
-            ImGui::Text("Initial Speed");
-            int speed = level[element_index].SPEED;
-            if(ImGui::SliderInt("##Speed", &speed, MIN_SPEED, MAX_SPEED))
+            if(level[element_index].INDEX == KAMEERA_MIRROR_INDEX)
             {
-                level[element_index].SPEED = speed;
+                bool is_spawn_gate = level[element_index].IS_SPAWN_GATE;
+                if(ImGui::Checkbox("Spawn enemies", &is_spawn_gate))
+                {
+                    is_spawn_gate= !is_spawn_gate;
+                    level[element_index].IS_SPAWN_GATE = !level[element_index].IS_SPAWN_GATE;
+                }
+                
+                if(is_spawn_gate)
+                {
+                    ImGui::Text("Number of enemies");
+                    int num_enemies_spawned = level[element_index].NUM_ENEMIES_SPAWNED;
+                    if(ImGui::SliderInt("##Number of enemies", &num_enemies_spawned, 1, 2))
+                    {
+                        level[element_index].NUM_ENEMIES_SPAWNED = num_enemies_spawned;
+                    }
+                    
+                    ImGui::Text("Enemy 1: ");
+                    ImGui::SameLine();
+                    ImGui::Text(enemies_list[level[element_index].ENEMY1_INDEX]);
+                    
+                    if (ImGui::ListBoxHeader("##enemy1", ImVec2(UI.LIST_WIDTH, UI.LIST_HEIGHT)))
+                    {   
+                        for (int i = 0; i < NUM_ENEMIES; ++i)
+                        {
+                            if(ImGui::Selectable(enemies_list[i]))
+                            {
+                                level[element_index].ENEMY1_INDEX = i;
+                            }
+                            
+                            if (ImGui::IsItemHovered())
+                            {
+                                ImGui::BeginTooltip();
+                                ImGui::Image(tex_enemies[i], ImVec2(64,64));
+                                ImGui::EndTooltip();
+                            }
+                        }
+                        ImGui::ListBoxFooter();
+                    }
+                    
+                    ImGui::Text("Initial Speed");
+                    int e1speed = level[element_index].ENEMY1_SPEED;
+                    if(ImGui::SliderInt("##enemy1Speed", &e1speed, MIN_SPEED, MAX_SPEED))
+                    {
+                        level[element_index].ENEMY1_SPEED = e1speed;
+                    }
+                    
+                    ImGui::Spacing();ImGui::Spacing();
+                    
+                    ImGui::Text("Initial direction");
+                    int e1dir = level[element_index].ENEMY1_DIR;
+                    
+                    if(ImGui::RadioButton("Left##e1", &e1dir, 0))
+                    {
+                        level[element_index].ENEMY1_DIR = e1dir;
+                    }
+                    if(ImGui::RadioButton("Right##e1", &e1dir, 1))
+                    {
+                        level[element_index].ENEMY1_DIR = e1dir;
+                    }
+                    if(ImGui::RadioButton("Up##e1", &e1dir, 2))
+                    {
+                        level[element_index].ENEMY1_DIR = e1dir;
+                    }
+                    if(ImGui::RadioButton("Down##e1", &e1dir, 3))
+                    {
+                        level[element_index].ENEMY1_DIR = e1dir;
+                    }
+                    
+                    if(level[element_index].NUM_ENEMIES_SPAWNED == 2)
+                    {
+                        ImGui::Text("Enemy 2: ");
+                        ImGui::SameLine();
+                        ImGui::Text(enemies_list[level[element_index].ENEMY2_INDEX]);
+                        
+                        if (ImGui::ListBoxHeader("##enemy2", ImVec2(UI.LIST_WIDTH, UI.LIST_HEIGHT)))
+                        {   
+                            for (int i = 0; i < NUM_ENEMIES; ++i)
+                            {
+                                if(ImGui::Selectable(enemies_list[i]))
+                                {
+                                    level[element_index].ENEMY2_INDEX = i;
+                                }
+                                
+                                if (ImGui::IsItemHovered())
+                                {
+                                    ImGui::BeginTooltip();
+                                    ImGui::Image(tex_enemies[i], ImVec2(64,64));
+                                    ImGui::EndTooltip();
+                                }
+                            }
+                            ImGui::ListBoxFooter();
+                        }
+                        
+                        ImGui::Text("Initial Speed");
+                        int e2speed = level[element_index].ENEMY2_SPEED;
+                        if(ImGui::SliderInt("##enemy2Speed", &e1speed, MIN_SPEED, MAX_SPEED))
+                        {
+                            level[element_index].ENEMY2_SPEED = e2speed;
+                        }
+                        
+                        ImGui::Spacing();ImGui::Spacing();
+                        
+                        ImGui::Text("Initial direction");
+                        int e2dir = level[element_index].ENEMY2_DIR;
+                        
+                        if(ImGui::RadioButton("Left##e2", &e2dir, 0))
+                        {
+                            level[element_index].ENEMY2_DIR = e2dir;
+                        }
+                        if(ImGui::RadioButton("Right##e2", &e2dir, 1))
+                        {
+                            level[element_index].ENEMY2_DIR = e2dir;
+                        }
+                        if(ImGui::RadioButton("Up##e2", &e2dir, 2))
+                        {
+                            level[element_index].ENEMY2_DIR = e2dir;
+                        }
+                        if(ImGui::RadioButton("Down##e2", &e2dir, 3))
+                        {
+                            level[element_index].ENEMY2_DIR = e2dir;
+                        }
+                    }
+                }
             }
-            
-            ImGui::Spacing();ImGui::Spacing();
-            
-            ImGui::Text("Initial direction");
-            int dir = level[element_index].DIR;
-            
-            if(ImGui::RadioButton("Left", &dir, 0))
+            else
             {
-                level[element_index].DIR = dir;
-            }
-            if(ImGui::RadioButton("Right", &dir, 1))
-            {
-                level[element_index].DIR = dir;
-            }
-            if(ImGui::RadioButton("Up", &dir, 2))
-            {
-                level[element_index].DIR = dir;
-            }
-            if(ImGui::RadioButton("Down", &dir, 3))
-            {
-                level[element_index].DIR = dir;
+                ImGui::Text("Initial Speed");
+                int speed = level[element_index].SPEED;
+                if(ImGui::SliderInt("##Speed", &speed, MIN_SPEED, MAX_SPEED))
+                {
+                    level[element_index].SPEED = speed;
+                }
+                
+                ImGui::Spacing();ImGui::Spacing();
+                
+                ImGui::Text("Initial direction");
+                int dir = level[element_index].DIR;
+                
+                if(ImGui::RadioButton("Left", &dir, 0))
+                {
+                    level[element_index].DIR = dir;
+                }
+                if(ImGui::RadioButton("Right", &dir, 1))
+                {
+                    level[element_index].DIR = dir;
+                }
+                if(ImGui::RadioButton("Up", &dir, 2))
+                {
+                    level[element_index].DIR = dir;
+                }
+                if(ImGui::RadioButton("Down", &dir, 3))
+                {
+                    level[element_index].DIR = dir;
+                }
             }
         }
         
@@ -341,9 +509,21 @@ void PlaceSelectedElement(int idx)
     level[idx].SPRITE.setTexture(*active_element.TEXTURE);
     level[idx].TYPE = active_element.TYPE;
     level[idx].INDEX = active_element.INDEX;
+    
     //reset all other properties to defaults
     level[idx].SPEED = DEFAULT_SPEED;
     level[idx].DIR = DEFAULT_DIR;
     level[idx].CONTAINS_HIDDEN = false;
     level[idx].HIDDEN_ITEM_INDEX = 0;
+    
+    level[idx].IS_SPAWN_GATE = false;
+    level[idx].DELAY = DEFAULT_DELAY;
+    level[idx].INTERVAL = DEFAULT_INTERVAL;
+    level[idx].NUM_ENEMIES_SPAWNED = DEFAULT_NUM_ENEMIES_SPAWNED;
+    level[idx].ENEMY1_INDEX = 0;
+    level[idx].ENEMY1_SPEED = DEFAULT_SPEED;
+    level[idx].ENEMY1_DIR = DEFAULT_DIR;
+    level[idx].ENEMY2_INDEX = 0;
+    level[idx].ENEMY2_SPEED = DEFAULT_SPEED;
+    level[idx].ENEMY2_DIR = DEFAULT_DIR;
 }

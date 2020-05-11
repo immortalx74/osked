@@ -26,12 +26,13 @@
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1250, 800), "Open Solomon's Key Editor", sf::Style::Close);
+    
 	window.setPosition(ImVec2(0,0));
     window.setFramerateLimit(60);
 	ImGui::SFML::Init(window);
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
     sf::Clock deltaClock;
-	
+    
     //setup
     LoadTextures();
     InitLevel();
@@ -64,7 +65,7 @@ int main()
         
 		ImGui::SFML::Update(window, deltaClock.restart());
         
-        // TOOLBOX //////////////////////////////////////////////////////////
+        //TOOLBOX //////////////////////////////////////////////////////////
         int app_window_height = io.DisplaySize.y;
         int app_window_width = io.DisplaySize.x;
         
@@ -77,30 +78,24 @@ int main()
         {
             // File open
             auto f = pfd::open_file("Open file", DEFAULT_PATH,
-                                    { "Text Files (.txt .text)", "*.txt *.text",
-                                    "All Files", "*" },
-                                    false);
+                                    {"Level File (.osk)", "*.osk"}, false);
             
-            //for (auto const &name : f.result())
-            //std::cout << " " + name;
-            std::cout << f.result()[0];
-            std::cout << "\n";
-            
-            //read file here
+            if(!f.result().empty())
+            {
+                LoadLevel(f.result()[0]);
+            }
         }
         ImGui::SameLine();
         if (ImGui::SmallButton("Save"))
         {
             // File save
             auto f = pfd::save_file("Save file", DEFAULT_PATH,
-                                    { "Text Files (.txt .text)", "*.txt *.text",
-                                    "All Files", "*" },
-                                    true);
+                                    {"Level File (.osk)", "*.osk"}, true);
             
-            std::cout << f.result();
-            std::cout << "\n";
-            
-            SaveLevel(f.result());
+            if(f.result() != "")
+            {
+                SaveLevel(f.result());
+            }
         }
         ImGui::SameLine();
         if (ImGui::SmallButton("Help"))
