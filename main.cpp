@@ -313,6 +313,18 @@ int main()
                 ImGui::EndTooltip();
             }
             
+            //show kameera mirror enemies(if set) on hover
+            if(level[idx].IS_SPAWN_GATE)
+            {
+                ImGui::BeginTooltip();
+                ImGui::Image(tex_enemies[level[idx].ENEMY1_INDEX], ImVec2(64,64));
+                if(level[idx].NUM_ENEMIES_SPAWNED == 2)
+                {
+                    ImGui::Image(tex_enemies[level[idx].ENEMY2_INDEX], ImVec2(64,64));
+                }
+                ImGui::EndTooltip();
+            }
+            
             //Set property popup to open
             if(ImGui::IsMouseClicked(1))
             {

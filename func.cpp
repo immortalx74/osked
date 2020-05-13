@@ -14,6 +14,7 @@ void LoadTextures()
     
     // unique
     x_offset = 0;
+    y_offset = 0;
     for (int i = 0; i < NUM_UNIQUE; ++i)
 	{
 	    t.loadFromFile("res/unique.png", sf::IntRect(x_offset, 0, 64, 64));
@@ -23,12 +24,13 @@ void LoadTextures()
     
     // enemies
     x_offset = 0;
+    y_offset = 0;
     for (int i = 0; i < NUM_ENEMIES; ++i)
     {
-        if (i == 7)
+        if (i > 0 && i % TEXTURE_NUM_COLUMNS == 0)
         {
             x_offset = 0;
-            y_offset = 64;
+            y_offset += 64;
         }
         
         t.loadFromFile("res/enemies.png", sf::IntRect(x_offset, y_offset, 64, 64));
@@ -41,10 +43,10 @@ void LoadTextures()
     y_offset = 0;
     for (int i = 0; i < NUM_ITEMS; ++i)
     {
-        if (i == 7)
+        if (i > 0 && i % TEXTURE_NUM_COLUMNS == 0)
         {
             x_offset = 0;
-            y_offset = 64;
+            y_offset += 64;
         }
         
         t.loadFromFile("res/items.png", sf::IntRect(x_offset, y_offset, 64, 64));
@@ -195,7 +197,34 @@ void SaveLevel(std::string filename)
             
             if(level[i].INDEX == KAMEERA_MIRROR_INDEX)
             {
-                //enemy1,speed1,dir1,enemy2,speed2,dir2
+                //delay,interval,enemy1,speed1,dir1,enemy2,speed2,dir2
+                file << level[i].DELAY;
+                file << ",";
+                file << level[i].INTERVAL;
+                
+                if(level[i].IS_SPAWN_GATE)
+                {
+                    file << ",";
+                    file << "{";
+                    file << level[i].ENEMY1_INDEX;
+                    file << ",";
+                    file << level[i].ENEMY1_SPEED;
+                    file << ",";
+                    file << level[i].ENEMY1_DIR;
+                    file << "}";
+                    
+                    if(level[i].NUM_ENEMIES_SPAWNED == 2)
+                    {
+                        file << ",";
+                        file << "{";
+                        file << level[i].ENEMY2_INDEX;
+                        file << ",";
+                        file << level[i].ENEMY2_SPEED;
+                        file << ",";
+                        file << level[i].ENEMY2_DIR;
+                        file << "}";
+                    }
+                }
             }
             else
             {
@@ -206,7 +235,7 @@ void SaveLevel(std::string filename)
         }
         else if(level[i].TYPE == ITEM)
         {
-            file << 10;//ITEM
+            file << 9;//ITEM
             file << ",";
             file << level[i].INDEX;
         }
@@ -226,26 +255,41 @@ void LoadLevel(std::string filename)
     std::string line;
     int value = 0;
     std::string ch;
+    TILE_TYPE cell_type;
+    
+    char space = ' ';
+    char comma = ',';
+    char comment = '#';
     
     while(std::getline(file, line))
     {
-        for (int i = 0; i < line.length(); ++i)
+        if(line.length() > 0 && line.at(0) == comment)
         {
-            if(isdigit(line.at(i)))
-            {
-                ch = line.at(i);
-                value = std::stoi(ch);
-                std::cout << value;
-                if(value == 0)
-                {
-                    
-                }
-            }
-            
+            continue;
         }
-        std::cout << "   --line end\n";
+        if(line.length() > 0 && line.at(0) == 'B')
+        {
+            int p = 1;
+            int result = 0;
+            std::string cur;
+            
+            for (int i = line.length() - 1; i >= 3 ; --i)
+            {
+                cur = line.at(i);
+                result += p* std::stoi(cur);
+                p *= 10;
+            }
+            background_index = result;
+            continue;
+        }
+        
+        int count = 0;
+        while(count < line.length())
+        {
+            
+            count++;
+        }
     }
-    
     
     file.close();
 }
@@ -269,8 +313,25 @@ void OpenPropertiesWindow()
         
         if(el_type == ENEMY)
         {
+            //kameera mirror is a special case of enemy
             if(level[element_index].INDEX == KAMEERA_MIRROR_INDEX)
             {
+                // gate delay
+                ImGui::Text("Initial delay");
+                int delay = level[element_index].DELAY;
+                if(ImGui::SliderInt("##delay", &delay, MIN_DELAY, MAX_DELAY))
+                {
+                    level[element_index].DELAY = delay;
+                }
+                
+                // gate interval
+                ImGui::Text("Spawn interval");
+                int interval = level[element_index].INTERVAL;
+                if(ImGui::SliderInt("##interval", &interval, MIN_INTERVAL, MAX_INTERVAL))
+                {
+                    level[element_index].INTERVAL = interval;
+                }
+                
                 bool is_spawn_gate = level[element_index].IS_SPAWN_GATE;
                 if(ImGui::Checkbox("Spawn enemies", &is_spawn_gate))
                 {
@@ -478,29 +539,38 @@ void OpenPropertiesWindow()
 void CheckForUniquePresence(int idx)
 {
     //prevent unique tiles getting set more than once
-    if(active_element.INDEX == 0 && active_element.TYPE == UNIQUE)
+    if(active_element.TYPE == UNIQUE)
     {
-        if(last_dana_index != -1)
+        if(active_element.INDEX == 0)
         {
-            level[last_dana_index].SPRITE.setTexture(tex_blocks[0]);
+            if(last_dana_index != -1)
+            {
+                level[last_dana_index].SPRITE.setTexture(tex_blocks[0]);
+                level[last_dana_index].TYPE = BLOCK;
+                level[last_dana_index].INDEX = 0;
+            }
+            last_dana_index = idx;
         }
-        last_dana_index = idx;
-    }
-    if(active_element.INDEX == 1 && active_element.TYPE == UNIQUE)
-    {
-        if(last_door_index != -1)
+        if(active_element.INDEX == 1)
         {
-            level[last_door_index].SPRITE.setTexture(tex_blocks[0]);
+            if(last_door_index != -1)
+            {
+                level[last_door_index].SPRITE.setTexture(tex_blocks[0]);
+                level[last_door_index].TYPE = BLOCK;
+                level[last_door_index].INDEX = 0;
+            }
+            last_door_index = idx;
         }
-        last_door_index = idx;
-    }
-    if(active_element.INDEX == 2 && active_element.TYPE == UNIQUE)
-    {
-        if(last_key_index != -1)
+        if(active_element.INDEX == 2)
         {
-            level[last_key_index].SPRITE.setTexture(tex_blocks[0]);
+            if(last_key_index != -1)
+            {
+                level[last_key_index].SPRITE.setTexture(tex_blocks[0]);
+                level[last_key_index].TYPE = BLOCK;
+                level[last_key_index].INDEX = 0;
+            }
+            last_key_index = idx;
         }
-        last_key_index = idx;
     }
 }
 

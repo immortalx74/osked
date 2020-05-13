@@ -1,19 +1,25 @@
 #define DEFAULT_PATH "C:\\"
+#define TEXTURE_NUM_COLUMNS 7
 
 #define NUM_BLOCKS 4
 #define NUM_UNIQUE 3
-#define NUM_ENEMIES 14
-#define NUM_ITEMS 14
+#define NUM_ENEMIES 18
+#define NUM_ITEMS 34
 #define NUM_BACKGROUNDS 27
 
 #define DEFAULT_SPEED 3
 #define MIN_SPEED 1
 #define MAX_SPEED 10
 #define DEFAULT_DIR 1
-#define KAMEERA_MIRROR_INDEX 13
+#define KAMEERA_MIRROR_INDEX 17
 #define DEFAULT_DELAY 20
 #define DEFAULT_INTERVAL 20
 #define DEFAULT_NUM_ENEMIES_SPAWNED 1
+#define MIN_DELAY 10
+#define MAX_DELAY 40
+#define MIN_INTERVAL 10
+#define MAX_INTERVAL 40
+
 
 struct METRICS
 {
@@ -58,7 +64,11 @@ const char *enemies_list[NUM_ENEMIES] = {
     "Earth Mage",
     "Spark Ball",
     "Flame",
-    "Kameera Mirror"
+    "Devil's emblem",
+    "Slime green",
+    "Slime orange",
+    "Slime purple",
+    "Kameera Mirror",
 };
 
 const char *items_list[NUM_ITEMS] = {
@@ -75,7 +85,27 @@ const char *items_list[NUM_ITEMS] = {
     "Coin 1000",
     "Coin 2000",
     "Coin 10000",
-    "Destruction Potion"
+    "Destruction Potion",
+    "Hourglass",
+    "Jewel 5k",
+    "Jewel 50k",
+    "Jewel 100",
+    "Jewel 200",
+    "Jewel 500",
+    "Jewel change",
+    "Jewel extend 1",
+    "Jewel extend 2",
+    "Potion fire",
+    "Potion fire super",
+    "Potion fire growth",
+    "Potion life",
+    "Potion time 1",
+    "Potion time 2",
+    "Scroll",
+    "Solomon seal",
+    "Sphinx",
+    "Paper crane",
+    "Solomon key",
 };
 
 int backgrounds_list[NUM_BACKGROUNDS];
