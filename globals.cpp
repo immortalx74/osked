@@ -4,21 +4,21 @@
 #define NUM_BLOCKS 4
 #define NUM_UNIQUE 3
 #define NUM_ENEMIES 18
-#define NUM_ITEMS 34
+#define NUM_ITEMS 38
 #define NUM_BACKGROUNDS 27
 
-#define DEFAULT_SPEED 3
-#define MIN_SPEED 1
-#define MAX_SPEED 10
+#define DEFAULT_SPEED 100
+#define MIN_SPEED 80
+#define MAX_SPEED 300
 #define DEFAULT_DIR 1
 #define KAMEERA_MIRROR_INDEX 17
-#define DEFAULT_DELAY 20
-#define DEFAULT_INTERVAL 20
+#define DEFAULT_DELAY 2
+#define DEFAULT_INTERVAL 2
 #define DEFAULT_NUM_ENEMIES_SPAWNED 1
-#define MIN_DELAY 10
-#define MAX_DELAY 40
-#define MIN_INTERVAL 10
-#define MAX_INTERVAL 40
+#define MIN_DELAY 0
+#define MAX_DELAY 20
+#define MIN_INTERVAL 0
+#define MAX_INTERVAL 20
 
 
 struct METRICS
@@ -36,7 +36,7 @@ struct METRICS
     float MAIN_HEIGHT = 0;
     
     float LIST_WIDTH = 230;
-    float LIST_HEIGHT = 120;
+    float LIST_HEIGHT = 136;
     
     float GRID_START_X = MAIN_X + (2 * MARGIN);
     float GRID_START_Y = MAIN_Y + (2 * MARGIN);
@@ -80,19 +80,19 @@ const char *items_list[NUM_ITEMS] = {
     "Bag 1000",
     "Bag 2000",
     "Bag 5000",
-    "Bell",
+    "Bell 1",
     "Coin 20K",
     "Coin 1000",
     "Coin 2000",
     "Coin 10000",
     "Destruction Potion",
-    "Hourglass",
+    "Hourglass 1",
     "Jewel 5k",
     "Jewel 50k",
     "Jewel 100",
     "Jewel 200",
     "Jewel 500",
-    "Jewel change",
+    "Jewel change 1",
     "Jewel extend 1",
     "Jewel extend 2",
     "Potion fire",
@@ -106,6 +106,10 @@ const char *items_list[NUM_ITEMS] = {
     "Sphinx",
     "Paper crane",
     "Solomon key",
+    "Jewel change 2",
+    "Hourglass 2",
+    "Tecmo plate",
+    "Bell 2"
 };
 
 int backgrounds_list[NUM_BACKGROUNDS];
@@ -118,12 +122,12 @@ enum TILE_TYPE
     ITEM
 };
 
-struct ACTIVE_ELEMENT
+struct SELECTED_ELEMENT
 {
     sf::Texture *TEXTURE = 0;
     int INDEX = 1;
     TILE_TYPE TYPE = BLOCK;
-}active_element;
+}selected_element;
 
 struct CELL
 {
@@ -154,6 +158,8 @@ CELL level[180];
 int last_dana_index = -1;
 int last_door_index = -1;
 int last_key_index = -1;
+int key_color = 0;
+int dana_dir = 0;
 int background_index = 0;
 
 sf::Sprite background_sprite;

@@ -4,7 +4,7 @@ void LoadTextures()
 	int y_offset = 0;
     sf::Texture t;
     
-	// blocks
+	// Blocks
     for (int i = 0; i < NUM_BLOCKS; ++i)
 	{
 	    t.loadFromFile("res/blocks.png", sf::IntRect(x_offset, 0, 64, 64));
@@ -12,7 +12,7 @@ void LoadTextures()
 	    x_offset += 64;
 	}
     
-    // unique
+    // Unique
     x_offset = 0;
     y_offset = 0;
     for (int i = 0; i < NUM_UNIQUE; ++i)
@@ -22,7 +22,7 @@ void LoadTextures()
 	    x_offset += 64;
 	}
     
-    // enemies
+    // Enemies
     x_offset = 0;
     y_offset = 0;
     for (int i = 0; i < NUM_ENEMIES; ++i)
@@ -38,7 +38,7 @@ void LoadTextures()
         x_offset += 64;
     }
     
-    // items
+    // Items
     x_offset = 0;
     y_offset = 0;
     for (int i = 0; i < NUM_ITEMS; ++i)
@@ -54,7 +54,7 @@ void LoadTextures()
         x_offset += 64;
     }
     
-    //backgrounds
+    // Backgrounds
     for (int i = 0; i < NUM_BACKGROUNDS; ++i)
     {
         backgrounds_list[i] = i;
@@ -64,20 +64,20 @@ void LoadTextures()
     }
 }
 
-void SetActiveTile(TILE_TYPE t, int index)
+void SetSelectedElementTexture(TILE_TYPE t, int index)
 {
     switch (t)
     {
         case ENEMY:
-        active_element.TEXTURE = &tex_enemies[index];
+        selected_element.TEXTURE = &tex_enemies[index];
         break;
         
         case ITEM:
-        active_element.TEXTURE = &tex_items[index];
+        selected_element.TEXTURE = &tex_items[index];
         break;
         
         default:
-        active_element.TEXTURE = &tex_blocks[1];
+        selected_element.TEXTURE = &tex_blocks[1];
     }
 }
 
@@ -112,7 +112,6 @@ void DrawLevel(sf::RenderWindow &w)
         
         if(level[i].CONTAINS_HIDDEN)
         {
-            //std::cout << i << std::endl;
             sf::Vector2f pos;
             pos = level[i].SPRITE.getPosition();
             hidden_sprite.setPosition(pos);
@@ -143,6 +142,22 @@ void DrawGrid()
 
 void SaveLevel(std::string filename)
 {
+    // BG :  Background index
+    // 0  :  Empty block, [optional] hidden item index
+    // 1  :  Destructible block, [optional] hidden item index
+    // 2  :  Solid block
+    // 4  :  Dana, Initial direction (0 = Left, 1 = Right)
+    // 6  :  Enemy, Enemy index, Speed, Direction (0 = Left, 1 = Right, 2 = Up, 3 = Down)
+    // 7  :  Door
+    // 8  :  Key, Key color (0 = Red, 1 = Green, 2 = Blue)
+    // 9  :  Item, Item index
+    
+    // If Kameera Mirror wasn't set to spawn enemies, delay and interval are saved but simply ignored in-game.
+    // If set to spawn enemies, first set enemy identifier (6), then Kameera mirror index (17) and finally:
+    //       Delay, Interval, {Enemy1 Index, Enemy1 Speed, Enemy1 Direction},
+    //       {Enemy2 Index, Enemy2 Speed, Enemy2 Direction}
+    // Second enemy properties are saved only if the mirror was set to spawn 2 enemies.
+    
     std::ofstream file;
     file.open(filename);
     
@@ -175,29 +190,32 @@ void SaveLevel(std::string filename)
         }
         else if(level[i].TYPE == UNIQUE)
         {
-            if(level[i].INDEX == 0)
+            if(level[i].INDEX == 0) // Dana
             {
-                file << 4;//dana
+                file << 4;
+                file << ",";
+                file << dana_dir;
             }
-            if(level[i].INDEX == 1)
+            if(level[i].INDEX == 1) // Door
             {
-                file << 7;//door
+                file << 7;
             }
-            if(level[i].INDEX == 2)
+            if(level[i].INDEX == 2) // Key
             {
-                file << 8;//key
+                file << 8;
+                file << ",";
+                file << key_color;
             }
         }
         else if(level[i].TYPE == ENEMY)
         {
-            file << 6;//ENEMY
+            file << 6;
             file << ",";
             file << level[i].INDEX;
             file << ",";
             
             if(level[i].INDEX == KAMEERA_MIRROR_INDEX)
             {
-                //delay,interval,enemy1,speed1,dir1,enemy2,speed2,dir2
                 file << level[i].DELAY;
                 file << ",";
                 file << level[i].INTERVAL;
@@ -235,13 +253,12 @@ void SaveLevel(std::string filename)
         }
         else if(level[i].TYPE == ITEM)
         {
-            file << 9;//ITEM
+            file << 9;
             file << ",";
             file << level[i].INDEX;
         }
         
         file << " ";
-        
         
     }
     
@@ -311,12 +328,46 @@ void OpenPropertiesWindow()
     {
         int el_type = level[element_index].TYPE;
         
-        if(el_type == ENEMY)
+        // Dana initial direction
+        if(el_type == UNIQUE && level[element_index].INDEX == 0)
         {
-            //kameera mirror is a special case of enemy
+            ImGui::Text("Initial Dana direction (effective only in-game)");
+            int dir = dana_dir;
+            
+            if(ImGui::RadioButton("Left##dd", &dir, 0))
+            {
+                dana_dir = dir;
+            }
+            if(ImGui::RadioButton("Right##dd", &dir, 1))
+            {
+                dana_dir = dir;
+            }
+        }
+        // Key color
+        else if(el_type == UNIQUE && level[element_index].INDEX == 2)
+        {
+            ImGui::Text("Key color (effective only in-game)");
+            int kc = key_color;
+            
+            if(ImGui::RadioButton("Red", &kc, 0))
+            {
+                key_color = kc;
+            }
+            if(ImGui::RadioButton("Green", &kc, 1))
+            {
+                key_color = kc;
+            }
+            if(ImGui::RadioButton("Blue", &kc, 2))
+            {
+                key_color = kc;
+            }
+        }
+        else if(el_type == ENEMY)
+        {
+            // Kameera mirror is a special case of enemy
             if(level[element_index].INDEX == KAMEERA_MIRROR_INDEX)
             {
-                // gate delay
+                // Delay
                 ImGui::Text("Initial delay");
                 int delay = level[element_index].DELAY;
                 if(ImGui::SliderInt("##delay", &delay, MIN_DELAY, MAX_DELAY))
@@ -324,7 +375,7 @@ void OpenPropertiesWindow()
                     level[element_index].DELAY = delay;
                 }
                 
-                // gate interval
+                // Interval
                 ImGui::Text("Spawn interval");
                 int interval = level[element_index].INTERVAL;
                 if(ImGui::SliderInt("##interval", &interval, MIN_INTERVAL, MAX_INTERVAL))
@@ -387,6 +438,7 @@ void OpenPropertiesWindow()
                     {
                         level[element_index].ENEMY1_DIR = e1dir;
                     }
+                    ImGui::SameLine();
                     if(ImGui::RadioButton("Right##e1", &e1dir, 1))
                     {
                         level[element_index].ENEMY1_DIR = e1dir;
@@ -395,6 +447,7 @@ void OpenPropertiesWindow()
                     {
                         level[element_index].ENEMY1_DIR = e1dir;
                     }
+                    ImGui::SameLine();
                     if(ImGui::RadioButton("Down##e1", &e1dir, 3))
                     {
                         level[element_index].ENEMY1_DIR = e1dir;
@@ -441,6 +494,7 @@ void OpenPropertiesWindow()
                         {
                             level[element_index].ENEMY2_DIR = e2dir;
                         }
+                        ImGui::SameLine();
                         if(ImGui::RadioButton("Right##e2", &e2dir, 1))
                         {
                             level[element_index].ENEMY2_DIR = e2dir;
@@ -449,6 +503,7 @@ void OpenPropertiesWindow()
                         {
                             level[element_index].ENEMY2_DIR = e2dir;
                         }
+                        ImGui::SameLine();
                         if(ImGui::RadioButton("Down##e2", &e2dir, 3))
                         {
                             level[element_index].ENEMY2_DIR = e2dir;
@@ -474,6 +529,7 @@ void OpenPropertiesWindow()
                 {
                     level[element_index].DIR = dir;
                 }
+                ImGui::SameLine();
                 if(ImGui::RadioButton("Right", &dir, 1))
                 {
                     level[element_index].DIR = dir;
@@ -482,6 +538,7 @@ void OpenPropertiesWindow()
                 {
                     level[element_index].DIR = dir;
                 }
+                ImGui::SameLine();
                 if(ImGui::RadioButton("Down", &dir, 3))
                 {
                     level[element_index].DIR = dir;
@@ -500,7 +557,7 @@ void OpenPropertiesWindow()
             
             if(hidden_item)
             {
-                //items list
+                // Items list
                 ImGui::Text("Hidden Item: ");
                 ImGui::SameLine();
                 ImGui::Text(items_list[level[element_index].HIDDEN_ITEM_INDEX]);
@@ -538,10 +595,10 @@ void OpenPropertiesWindow()
 
 void CheckForUniquePresence(int idx)
 {
-    //prevent unique tiles getting set more than once
-    if(active_element.TYPE == UNIQUE)
+    // Prevent unique elements getting set more than once
+    if(selected_element.TYPE == UNIQUE)
     {
-        if(active_element.INDEX == 0)
+        if(selected_element.INDEX == 0)
         {
             if(last_dana_index != -1)
             {
@@ -551,7 +608,7 @@ void CheckForUniquePresence(int idx)
             }
             last_dana_index = idx;
         }
-        if(active_element.INDEX == 1)
+        if(selected_element.INDEX == 1)
         {
             if(last_door_index != -1)
             {
@@ -561,7 +618,7 @@ void CheckForUniquePresence(int idx)
             }
             last_door_index = idx;
         }
-        if(active_element.INDEX == 2)
+        if(selected_element.INDEX == 2)
         {
             if(last_key_index != -1)
             {
@@ -576,11 +633,11 @@ void CheckForUniquePresence(int idx)
 
 void PlaceSelectedElement(int idx)
 {
-    level[idx].SPRITE.setTexture(*active_element.TEXTURE);
-    level[idx].TYPE = active_element.TYPE;
-    level[idx].INDEX = active_element.INDEX;
+    level[idx].SPRITE.setTexture(*selected_element.TEXTURE);
+    level[idx].TYPE = selected_element.TYPE;
+    level[idx].INDEX = selected_element.INDEX;
     
-    //reset all other properties to defaults
+    // Reset all other properties to defaults
     level[idx].SPEED = DEFAULT_SPEED;
     level[idx].DIR = DEFAULT_DIR;
     level[idx].CONTAINS_HIDDEN = false;
