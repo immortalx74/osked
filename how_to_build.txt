@@ -1,0 +1,16 @@
+Make this directory structure and run build.bat
+
+[build]
+[imgui]
+--imgui files
+[include]
+--[SFML]
+----sfml include files
+--portable-file-dialogs.h
+[lib]
+-- sfml lib files
+[res]
+func.cpp
+globals.cpp
+main.cpp
+build.bat
